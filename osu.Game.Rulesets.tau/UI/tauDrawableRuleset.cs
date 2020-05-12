@@ -28,7 +28,13 @@ namespace osu.Game.Rulesets.Tau.UI
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new TauFramedReplayInputHandler(replay);
 
-        public override DrawableHitObject<TauHitObject> CreateDrawableRepresentation(TauHitObject h) => new DrawabletauHitObject(h);
+        public override DrawableHitObject<TauHitObject> CreateDrawableRepresentation(TauHitObject h) =>
+            h switch
+            {
+                Slider slider => new DrawableSlider(slider),
+                TauHitObject beat => new DrawabletauHitObject(beat),
+                _ => null
+            };
 
         protected override PassThroughInputManager CreateInputManager() => new TauInputManager(Ruleset?.RulesetInfo);
 

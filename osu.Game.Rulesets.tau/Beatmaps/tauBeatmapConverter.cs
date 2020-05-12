@@ -30,6 +30,19 @@ namespace osu.Game.Rulesets.Tau.Beatmaps
 
             switch (original)
             {
+                case IHasCurve curveData:
+                    return new Slider
+                    {
+                        StartTime = original.StartTime,
+                        Samples = original.Samples,
+                        Path = curveData.Path,
+                        NodeSamples = curveData.NodeSamples,
+                        RepeatCount = curveData.RepeatCount,
+                        Angle = position.GetHitObjectAngle(),
+                        NewCombo = comboData?.NewCombo ?? false,
+                        ComboOffset = comboData?.ComboOffset ?? 0,
+                    }.Yield();
+
                 default:
                     return new TauHitObject
                     {
