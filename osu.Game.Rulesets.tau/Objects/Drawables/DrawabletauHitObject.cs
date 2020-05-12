@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Tau.Objects.Drawables
     {
         public Box Box;
 
-        public Func<DrawabletauHitObject, bool> CheckValidation;
+        public Func<DrawabletauHitObject, bool> CheckValidation { get; set; }
 
         /// <summary>
         /// A list of keys which can result in hits for this HitObject.
@@ -98,6 +98,7 @@ namespace osu.Game.Rulesets.Tau.Objects.Drawables
 
             if (CheckValidation.Invoke(this))
             {
+                // On sliders, this will always return None.
                 var result = HitObject.HitWindows.ResultFor(timeOffset);
 
                 if (result == HitResult.None)
