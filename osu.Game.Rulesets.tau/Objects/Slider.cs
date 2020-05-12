@@ -4,6 +4,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Audio;
+using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
@@ -14,7 +16,7 @@ namespace osu.Game.Rulesets.Tau.Objects
     {
         public double EndTime
         {
-            get => StartTime + this.SpanCount() * Path.Distance;
+            get => StartTime + this.SpanCount() * Path.Distance / Velocity;
             set => throw new System.NotSupportedException($"Adjust via {nameof(RepeatCount)} instead"); // can be implemented if/when needed.
         }
 
@@ -44,9 +46,26 @@ namespace osu.Game.Rulesets.Tau.Objects
             }
         }
 
+        /// <summary>
+        /// Velocity of this <see cref="Slider"/>.
+        /// </summary>
+        public double Velocity { get; private set; }
+
         public Slider()
         {
             SamplesBindable.CollectionChanged += (_, __) => updateNestedSamples();
+        }
+
+        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        {
+            base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
+
+            TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
+            DifficultyControlPoint difficultyPoint = controlPointInfo.DifficultyPointAt(StartTime);
+
+            double scoringDistance = 100 * difficulty.SliderMultiplier * difficultyPoint.SpeedMultiplier;
+
+            Velocity = scoringDistance / timingPoint.BeatLength;
         }
 
         private void updateNestedSamples()
