@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Tau.Objects.Drawables
     {
         public Box Box;
 
-        public Func<DrawabletauHitObject, bool> CheckValidation { get; set; }
+        public Func<DrawabletauHitObject, bool> CheckValidation;
 
         /// <summary>
         /// A list of keys which can result in hits for this HitObject.
