@@ -3,8 +3,8 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Lines;
+using osu.Game.Rulesets.Objects;
 using osuTK;
 
 namespace osu.Game.Rulesets.Tau.Objects.Drawables
@@ -20,16 +20,18 @@ namespace osu.Game.Rulesets.Tau.Objects.Drawables
             : base(hitObject)
         {
             slider = hitObject;
-
-            slider.Path.GetPathToProgress(CurrentCurve, 0, 1);
+            convertPath();
 
             AddInternal(DrawablePath = new SmoothPath
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.TopLeft,
-                PathRadius = 2.5f,
-                Vertices = CurrentCurve
+                Rotation = hitObject.Angle,
+                PathRadius = 2.5f
             });
+        }
+
+        private void convertPath()
+        {
+            slider.Path.ControlPoints[0] = new PathControlPoint(Box.OriginPosition, slider.Path.ControlPoints[0].Type.Value);
         }
 
         protected override void Update()
@@ -39,6 +41,8 @@ namespace osu.Game.Rulesets.Tau.Objects.Drawables
             double completionProgress = Math.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
             slider.Path.GetPathToProgress(CurrentCurve, completionProgress, 1);
             DrawablePath.Vertices = CurrentCurve;
+
+            DrawablePath.OriginPosition = Box.OriginPosition;
         }
     }
 }
