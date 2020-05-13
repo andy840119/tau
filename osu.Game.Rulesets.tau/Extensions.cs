@@ -12,13 +12,18 @@ namespace osu.Game.Rulesets.Tau
         public static float GetDegreesFromPosition(this Vector2 target, Vector2 self)
         {
             Vector2 offset = self - target;
+
             return (float)MathHelper.RadiansToDegrees(Math.Atan2(-offset.X, offset.Y));
         }
 
         public static float GetHitObjectAngle(this Vector2 target)
         {
             Vector2 offset = new Vector2(256, 192) - target; // Using centre of playfield.
+
             return (float)MathHelper.RadiansToDegrees(Math.Atan2(offset.X, -offset.Y)) - 90;
         }
+
+        public static Vector2 GetPositionFromAngle(this float target, float distance)
+            => new Vector2(-(float)Math.Cos(target) * distance, -(float)Math.Sin(target) * distance);
     }
 }
