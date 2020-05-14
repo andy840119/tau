@@ -3,8 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Graphics.Lines;
-using osu.Game.Rulesets.Objects;
 using osuTK;
 
 namespace osu.Game.Rulesets.Tau.Objects.Drawables
@@ -14,13 +14,15 @@ namespace osu.Game.Rulesets.Tau.Objects.Drawables
         private Slider slider;
 
         public SmoothPath DrawablePath;
-        public readonly List<Vector2> CurrentCurve = new List<Vector2>();
+        public List<Vector2> CurrentCurve = new List<Vector2>();
 
         public DrawableSlider(Slider hitObject)
             : base(hitObject)
         {
             slider = hitObject;
-            convertPath();
+
+            slider.Path.GetPathToProgress(CurrentCurve, 0, 1);
+            CurrentCurve = convertPath().ToList();
 
             AddInternal(DrawablePath = new SmoothPath
             {
@@ -29,10 +31,11 @@ namespace osu.Game.Rulesets.Tau.Objects.Drawables
             });
         }
 
-        private void convertPath()
-        {
-            slider.Path.ControlPoints[0] = new PathControlPoint(Box.OriginPosition, slider.Path.ControlPoints[0].Type.Value);
-        }
+        private IEnumerable<Vector2> convertPath() =>
+            from point in CurrentCurve
+            let angle = point.GetHitObjectAngle()
+            let distance = CurrentCurve.IndexOf(point)
+            select angle.GetPositionFromAngle(distance);
 
         protected override void Update()
         {
@@ -40,6 +43,8 @@ namespace osu.Game.Rulesets.Tau.Objects.Drawables
 
             double completionProgress = Math.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
             slider.Path.GetPathToProgress(CurrentCurve, completionProgress, 1);
+            CurrentCurve = convertPath().ToList();
+
             DrawablePath.Vertices = CurrentCurve;
 
             DrawablePath.OriginPosition = Box.OriginPosition;
